@@ -38,7 +38,7 @@ const App = () => {
   return (
     <View style={styles.container}>
       <View style={styles.inputContainer}>
-        <Text style={styles.label}>Departure Date (MM/DD/YYYY)</Text>
+        <Text style={styles.label}>Expected Arrival Date (MM/DD/YYYY)</Text>
         <TextInput
           style={styles.input}
           placeholder="Select Date"
@@ -60,7 +60,7 @@ const App = () => {
       </View>
 
       <View style={styles.inputContainer}>
-        <Text style={styles.label}>Departure Time (Military Time)</Text>
+        <Text style={styles.label}>Expected Arrival Time (Military Time)</Text>
         <TextInput
           style={styles.input}
           placeholder="Select Time"
