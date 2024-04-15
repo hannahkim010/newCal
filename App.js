@@ -1,193 +1,113 @@
-import React, { useState, useRef } from 'react';
-import { View, ScrollView, Button, StyleSheet, Text, Alert, TouchableOpacity, Modal } from 'react-native';
-import { WebView } from 'react-native-webview';
-import Signature from 'react-native-signature-canvas';
+import React, { useState } from 'react';
+import { View, Button, TextInput, Text, Platform, StyleSheet } from 'react-native';
+import DateTimePicker from '@react-native-community/datetimepicker';
 
 const App = () => {
-  const [signature, setSignature] = useState(null);
-  const [agreed, setAgreed] = useState(false);
-  const [submitted, setSubmitted] = useState(false);
-  const [showSignatureModal, setShowSignatureModal] = useState(false);
-  const [signatureStarted, setSignatureStarted] = useState(false);
-  const signatureRef = useRef(null);
+  const [date, setDate] = useState(new Date());
+  const [showDate, setShowDate] = useState(false);
+  const [showTime, setShowTime] = useState(false);
+  const [dateInput, setDateInput] = useState('');
+  const [timeInput, setTimeInput] = useState('');
+  const [finalDateTime, setFinalDateTime] = useState(''); 
 
-  const handleSignature = (signature) => {
-    setSignature(signature);
-    setSignatureStarted(false);
+  const onDateChange = (event, selectedDate) => {
+    const currentDate = selectedDate || date;
+    setShowDate(Platform.OS === 'ios');
+    setDate(currentDate);
+
+    let tempDate = new Date(currentDate);
+    let fDate = (tempDate.getMonth() + 1) + '/' + tempDate.getDate() + '/' + tempDate.getFullYear();
+    setDateInput(fDate);
   };
 
-  const handleSignatureStart = () => {
-    setSignatureStarted(true);
-  };
+  const onTimeChange = (event, selectedTime) => {
+    const currentTime = selectedTime || date;
+    setShowTime(Platform.OS === 'ios');
+    setDate(currentTime);
 
-  const handleConfirm = () => {
-    setShowSignatureModal(true);
-  };
-
-  const handleClose = () => {
-    handleClear();
-    setShowSignatureModal(false);
+    let tempTime = new Date(currentTime);
+    let fTime = tempTime.getHours().toString().padStart(2, '0') + ':' + tempTime.getMinutes().toString().padStart(2, '0');
+    setTimeInput(fTime);
   };
 
   const handleSubmit = () => {
-    if (signature) {
-      setSubmitted(true);
-      setShowSignatureModal(false);
-    }
-    Alert.alert('Alert', 'Signature Submitted', [
-      {
-      text: 'Ok',
-      },
-    ]);
-    
+    setFinalDateTime(`${dateInput} ${timeInput}`);
+    alert(`Final Date and Time: ${dateInput} ${timeInput}`);
   };
 
-  const handleClear = () => {
-    if (signatureRef.current) {
-      signatureRef.current.clearSignature();
-    }
-    setSignature(null);
-    setSignatureStarted(false);
-  }
-
-
-
-  // if (submitted) {
-  //   return (
-  //     <View style={styles.submittedContainer}>
-  //       <Text style={styles.submittedText}>Signature Done</Text>
-  //     </View>
-  //   );
-  // }
-
   return (
-    <ScrollView style={styles.container}>
-      <WebView
-        style={styles.pdfViewer}
-        source={{ uri: 'https://docs.google.com/document/d/1IzfA4JVlFhV_CHi71kG9r6-nHizRTmZfiITBJS5EAAA/edit?usp=sharing' }}
-      />
-      <View style={styles.agreementContainer}>
-        <TouchableOpacity
-          style={[styles.checkbox, agreed && styles.checkedCheckbox]}
-          onPress={() => setAgreed(!agreed)}
-        >
-          {agreed && <Text style={styles.checkmark}>✔️</Text>}
-        </TouchableOpacity>
-        <Text>I have read and agree to the Terms and Conditions</Text>
+    <View style={styles.container}>
+      <View style={styles.inputContainer}>
+        <Text style={styles.label}>Expected Arrival Date (MM/DD/YYYY)</Text>
+        <TextInput
+          style={styles.input}
+          placeholder="Select Date"
+          value={dateInput}
+          onFocus={() => {
+            setShowDate(true);
+          }}
+          showSoftInputOnFocus={false} 
+        />
+        {showDate && (
+          <DateTimePicker
+            testID="dateTimePicker"
+            value={date}
+            mode={'date'}
+            display="default"
+            onChange={onDateChange}
+          />
+        )}
       </View>
-      <Button title="Confirm" onPress={handleConfirm} disabled={!agreed} />
-      <Modal visible={showSignatureModal} transparent={true}>
-        <View style={styles.signatureModal}>
-          
-          <View style={styles.signatureBox}>
-          <TouchableOpacity style={styles.closeButton} onPress={handleClose}>
-            <Text style={styles.closeButtonText}>X</Text>
-          </TouchableOpacity>
-            <Text style={styles.signatureTitle}>E-Signature</Text>
-            <View style={styles.signatureCanvas}>
-              <Signature
-                ref={signatureRef}
-                onOK={handleSignature}
-                onBegin={handleSignatureStart}
-                descriptionText=""
-                clearText="Clear"
-                confirmText="Save"
-                webStyle={`
-                  .m-signature-pad--footer {display: none; margin: 0px;}
-                  .m-signature-pad {box-shadow: none; border: 2px solid black;}
-                  .m-signature-pad--body {border: none;}
-                `}
-              />
-            </View>
-            <View style={ {flexDirection:"row"} }>
-              <Button title="Submit" onPress={handleSubmit} disabled={!signatureStarted} />
-              <Button title="Clear" onPress={handleClear} disabled={!signatureStarted} />
-            </View>
-            
-          </View>
-        </View>
-      </Modal>
-    </ScrollView>
+
+      <View style={styles.inputContainer}>
+        <Text style={styles.label}>Expected Arrival Time (Military Time)</Text>
+        <TextInput
+          style={styles.input}
+          placeholder="Select Time"
+          value={timeInput}
+          onFocus={() => {
+            setShowTime(true);
+          }}
+          showSoftInputOnFocus={false} 
+        />
+        {showTime && (
+          <DateTimePicker
+            testID="dateTimePicker"
+            value={date}
+            mode={'time'}
+            is24Hour={true}
+            display="default"
+            onChange={onTimeChange}
+          />
+        )}
+      </View>
+
+      <Button title="Submit" onPress={handleSubmit} />
+    </View>
   );
 };
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-  },
-  pdfViewer: {
-    height: 600, 
-    marginBottom: 100,
-    marginLeft: 10,
-    marginRight: 10,
-    marginTop: 30,
-  },
-  agreementContainer: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    margin: 10,
-  },
-  checkbox: {
-    width: 20,
-    height: 20,
-    borderWidth: 1,
-    borderColor: '#000',
-    marginRight: 10,
     justifyContent: 'center',
     alignItems: 'center',
-    backgroundColor: '#fff',
-  },
-  checkedCheckbox: {
-    backgroundColor: '#fff',
-  },
-  checkedIndicator: {
-    width: 12,
-    height: 12,
-    backgroundColor: '#fff',
-  },
-  signatureModal: {
-    flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-    backgroundColor: 'rgba(0,0,0,0.5)',
-  },
-  closeButton: {
-    alignSelf: 'flex-start', // Align self allows the button to position itself independently within the parent container
-    backgroundColor: '#fff',
-    padding: 5,
-    borderRadius: 10,
-  },
-  closeButtonText: {
-    fontSize: 18,
-    fontWeight: 'bold',
-    color: '#000',
-  },
-  signatureBox: {
-    width: '90%',
-    backgroundColor: '#fff',
     padding: 20,
-    borderRadius: 15,
-    alignItems: 'center',
   },
-  signatureTitle: {
-    fontSize: 18,
-    fontWeight: 'bold',
-    marginBottom: 10,
-  },
-  signatureCanvas: {
+  inputContainer: {
+    marginBottom: 20,
     width: '100%',
-    height: 150,
-    marginBottom: 15,
-    borderBottomWidth: 2,
   },
-  submittedContainer: {
-    flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  submittedText: {
-    fontSize: 20,
+  label: {
+    marginBottom: 8,
+    fontSize: 16,
     fontWeight: 'bold',
+  },
+  input: {
+    borderWidth: 1,
+    borderColor: '#999',
+    padding: 10,
+    borderRadius: 5,
   },
 });
 
