@@ -38,7 +38,7 @@ const App = () => {
   return (
     <View style={styles.container}>
       <View style={styles.inputContainer}>
-        <Text style={styles.label}>Expected Arrival Date (MM/DD/YYYY)</Text>
+        <Text style={styles.label}>Departure Date (MM/DD/YYYY)</Text>
         <TextInput
           style={styles.input}
           placeholder="Select Date"
@@ -60,7 +60,7 @@ const App = () => {
       </View>
 
       <View style={styles.inputContainer}>
-        <Text style={styles.label}>Expected Arrival Time (Military Time)</Text>
+        <Text style={styles.label}>Departure Time (Military Time)</Text>
         <TextInput
           style={styles.input}
           placeholder="Select Time"
@@ -90,6 +90,7 @@ const App = () => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
+    backgroundColor: '#000',
     justifyContent: 'center',
     alignItems: 'center',
     padding: 20,
@@ -102,12 +103,14 @@ const styles = StyleSheet.create({
     marginBottom: 8,
     fontSize: 16,
     fontWeight: 'bold',
+    color: '#FFF',
   },
   input: {
     borderWidth: 1,
     borderColor: '#999',
     padding: 10,
     borderRadius: 5,
+    backgroundColor: '#FFF',
   },
 });
 
