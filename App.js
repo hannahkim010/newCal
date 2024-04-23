@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { View, Button, TextInput, Text, Platform, StyleSheet } from 'react-native';
+import { View, Text, TextInput, TouchableOpacity, StyleSheet, Alert, Platform } from 'react-native';
 import DateTimePicker from '@react-native-community/datetimepicker';
 
 const App = () => {
@@ -8,51 +8,112 @@ const App = () => {
   const [showTime, setShowTime] = useState(false);
   const [dateInput, setDateInput] = useState('');
   const [timeInput, setTimeInput] = useState('');
-  const [finalDateTime, setFinalDateTime] = useState(''); 
+  const [name, setName] = useState('');
+  const [from, setFrom] = useState('');
+  const [to, setTo] = useState('');
+  const [airlineCode, setAirlineCode] = useState('');
+  const [flightNumber, setFlightNumber] = useState('');
 
   const onDateChange = (event, selectedDate) => {
     const currentDate = selectedDate || date;
     setShowDate(Platform.OS === 'ios');
     setDate(currentDate);
-
-    let tempDate = new Date(currentDate);
-    let fDate = (tempDate.getMonth() + 1) + '/' + tempDate.getDate() + '/' + tempDate.getFullYear();
-    setDateInput(fDate);
+    const formattedDate = (currentDate.getMonth() + 1) + '/' + currentDate.getDate() + '/' + currentDate.getFullYear();
+    setDateInput(formattedDate);
   };
 
   const onTimeChange = (event, selectedTime) => {
     const currentTime = selectedTime || date;
     setShowTime(Platform.OS === 'ios');
     setDate(currentTime);
-
-    let tempTime = new Date(currentTime);
-    let fTime = tempTime.getHours().toString().padStart(2, '0') + ':' + tempTime.getMinutes().toString().padStart(2, '0');
-    setTimeInput(fTime);
+    const formattedTime = currentTime.getHours().toString().padStart(2, '0') + ':' + currentTime.getMinutes().toString().padStart(2, '0');
+    setTimeInput(formattedTime);
   };
 
   const handleSubmit = () => {
-    setFinalDateTime(`${dateInput} ${timeInput}`);
-    alert(`Final Date and Time: ${dateInput} ${timeInput}`);
+    Alert.alert('Final Date and Time', `${dateInput} ${timeInput}`);
+  };
+
+  const isFormComplete = () => {
+    return (
+      name !== '' &&
+      from !== '' &&
+      to !== '' &&
+      airlineCode !== '' &&
+      flightNumber !== '' &&
+      dateInput !== '' &&
+      timeInput !== ''
+    );
   };
 
   return (
     <View style={styles.container}>
+      <Text style={styles.title}>Manual Departure Input</Text>
+
+      <View style={styles.inputContainer}>
+        <Text style={styles.label}>Name:</Text>
+        <TextInput
+          style={styles.input}
+          value={name}
+          onChangeText={setName}
+          placeholder="Enter Name"
+        />
+      </View>
+
+      <View style={styles.inputContainer}>
+        <Text style={styles.label}>From:</Text>
+        <TextInput
+          style={styles.input}
+          value={from}
+          onChangeText={setFrom}
+          placeholder="Enter Departure Location"
+        />
+      </View>
+
+      <View style={styles.inputContainer}>
+        <Text style={styles.label}>To:</Text>
+        <TextInput
+          style={styles.input}
+          value={to}
+          onChangeText={setTo}
+          placeholder="Enter Arrival Location"
+        />
+      </View>
+
+      <View style={styles.inputContainer}>
+        <Text style={styles.label}>Airline Code:</Text>
+        <TextInput
+          style={styles.input}
+          value={airlineCode}
+          onChangeText={setAirlineCode}
+          placeholder="Enter Airline Code"
+        />
+      </View>
+
+      <View style={styles.inputContainer}>
+        <Text style={styles.label}>Flight Number:</Text>
+        <TextInput
+          style={styles.input}
+          value={flightNumber}
+          onChangeText={setFlightNumber}
+          placeholder="Enter Flight Number"
+        />
+      </View>
+
       <View style={styles.inputContainer}>
         <Text style={styles.label}>Departure Date (MM/DD/YYYY)</Text>
         <TextInput
           style={styles.input}
           placeholder="Select Date"
           value={dateInput}
-          onFocus={() => {
-            setShowDate(true);
-          }}
-          showSoftInputOnFocus={false} 
+          onFocus={() => setShowDate(true)}
+          showSoftInputOnFocus={false}
         />
         {showDate && (
           <DateTimePicker
             testID="dateTimePicker"
             value={date}
-            mode={'date'}
+            mode="date"
             display="default"
             onChange={onDateChange}
           />
@@ -65,24 +126,28 @@ const App = () => {
           style={styles.input}
           placeholder="Select Time"
           value={timeInput}
-          onFocus={() => {
-            setShowTime(true);
-          }}
-          showSoftInputOnFocus={false} 
+          onFocus={() => setShowTime(true)}
+          showSoftInputOnFocus={false}
         />
         {showTime && (
           <DateTimePicker
             testID="dateTimePicker"
             value={date}
-            mode={'time'}
+            mode="time"
             is24Hour={true}
             display="default"
             onChange={onTimeChange}
           />
         )}
       </View>
-
-      <Button title="Submit" onPress={handleSubmit} />
+      
+      <TouchableOpacity
+        style={[styles.button, { backgroundColor: isFormComplete() ? '#FFF' : '#383838' }]}
+        onPress={handleSubmit}
+        disabled={!isFormComplete()}
+      >
+        <Text style={[styles.buttonText, { color: isFormComplete() ? '#000' : '#606060' }]}>SUBMIT</Text>
+      </TouchableOpacity>
     </View>
   );
 };
@@ -94,6 +159,11 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
     padding: 20,
+  },
+  title: {
+    color: '#FFF',
+    fontSize: 24,
+    fontWeight: 'bold',
   },
   inputContainer: {
     marginBottom: 20,
@@ -111,6 +181,15 @@ const styles = StyleSheet.create({
     padding: 10,
     borderRadius: 5,
     backgroundColor: '#FFF',
+  },
+  button: {
+    alignItems: 'center',
+    padding: 10,
+    borderRadius: 5,
+    width: '100%',
+  },
+  buttonText: {
+    fontSize: 16,
   },
 });
 
